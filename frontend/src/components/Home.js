@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom";
+import AppBar from "@mui/material/AppBar";
 
-const Home = () => {
-  return <div>PAGE WHERE PILOT INPUTS DEPARTURE AND ARRIVAL INFO</div>;
-};
+const Home = () => {};
 
 export default Home;
