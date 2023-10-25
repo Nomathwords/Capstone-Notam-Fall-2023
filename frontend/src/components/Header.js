@@ -67,17 +67,17 @@ export default function Header(props) {
           <Grid item xs={8}>
             <TextField
               required
-              id="filled-basic"
-              label="Required"
-              defaultValue="Departure Airport"
+              id="standard-search"
+              label="Departure Airport"
+              variant="standard"
             />
           </Grid>
           <Grid item xs={8}>
             <TextField
               required
-              id="filled-basic"
-              label="Required"
-              defaultValue="Arrival Airport"
+              id="standard-search"
+              label="Departure Airport"
+              variant="standard"
             />
           </Grid>
         </Grid>
