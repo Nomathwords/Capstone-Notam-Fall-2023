@@ -28,10 +28,13 @@ def get_notams(departure_airport, destination_airport):
     #Get destination_airport notams 
     notams += retrieve_location_notams(destination_airport)
     
+    #Get GPS notams
+    notams += retrieve_location_notams("GPS");
+    
     return notams
 
 def retrieve_location_notams(location):
-    print(f'Getting notams from {location} airport')
+    print(f'Getting notams from {location}')
     #Get the first response
     params = {"domesticLocation": location, "pageSize": PAGE_SIZE}
     response = query_notam_api(params)
@@ -75,7 +78,7 @@ def retrieve_lat_long_notams(latitude, longitude):
         notams += query_notam_api(params).json()['items']
         page_num+=1
     return notams
-    
+
 #Hit FAA api
 def query_notam_api(params):
     response = requests.get(api_url, headers=headers, params=params)
