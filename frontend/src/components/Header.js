@@ -76,7 +76,7 @@ export default function Header(props) {
             <TextField
               required
               id="standard-search"
-              label="Departure Airport"
+              label="Arrival Airport"
               variant="standard"
             />
           </Grid>
