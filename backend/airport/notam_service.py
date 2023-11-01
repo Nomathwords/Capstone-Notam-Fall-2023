@@ -1,5 +1,5 @@
 import pip._vendor.requests as requests
-from . import credentials, csv_parser, lat_long_shifting
+from . import credentials, csv_parser, lat_long_shifting, notam_filter
 
 api_url = "https://external-api.faa.gov/notamapi/v1/notams?"
 headers =  {"Content-Type":"application/json", "client_id": credentials.client_id, 
@@ -13,7 +13,6 @@ def get_notams(departure_airport, destination_airport):
     #Get lat/longs of dep and dest airports 
     dep_lat, dep_long, dest_lat, dest_long = csv_parser.get_lat_long(departure_airport, destination_airport)
         
-    
     #Get depature notams
     notams = retrieve_location_notams(departure_airport)
     
@@ -30,6 +29,12 @@ def get_notams(departure_airport, destination_airport):
     
     #Get GPS notams
     notams += retrieve_location_notams("GPS");
+    
+    print(f"Filtering {len(notams)} notams")
+    
+    notams = notam_filter.filter_notams(notams)
+    
+    print(f"Sending {len(notams)} notams")
     
     return notams
 
