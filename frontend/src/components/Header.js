@@ -6,7 +6,9 @@ import { makeStyles } from "@mui/styles";
 import Box from "@mui/material/Box";
 import logo from "../assets/plane.svg";
 import Grid from "@mui/material/Grid";
-import TextField from "@mui/material/TextField";
+import AirportFilter from "./AirportFilter";
+import { useState } from "react";
+import Alert from "@mui/material/Alert";
 
 const useStyles = makeStyles((theme) => ({
   toolBarMargin: {
@@ -19,6 +21,26 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Header(props) {
   const classes = useStyles();
+
+  const [departureAirport, setDepartureAirport] = useState(null);
+  const [arrivalAirport, setArrivalAirport] = useState(null);
+  const [error, setError] = useState(false);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    // Set up backend call here
+    if (departureAirport && arrivalAirport) {
+      console.log(departureAirport, arrivalAirport);
+      setError(false);
+    } else {
+      setError(true);
+    }
+  };
+
+  const handleCloseAlert = () => {
+    setError(false);
+  };
 
   return (
     <React.Fragment>
@@ -34,6 +56,54 @@ export default function Header(props) {
             Enter Flight Information
           </Typography>
         </Toolbar>
+        {error ? (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              width: "100%",
+              zIndex: "100",
+              alignContent: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Alert
+              severity="info"
+              style={{
+                width: "100%",
+                justifyContent: "center",
+                fontSize: 16,
+                borderRadius: "0px",
+              }}
+            >
+              Please enter both departure and arrival airports!
+            </Alert>
+            <div
+              style={{
+                backgroundColor: "#E8F5FC",
+                justifyContent: "center",
+                alignContent: "center",
+                display: "flex",
+                padding: "10px 10px",
+              }}
+            >
+              <button
+                style={{
+                  color: "indianred",
+                  backgroundColor: "transparent",
+                  border: "1px solid grey",
+                  cursor: "pointer",
+                  borderRadius: "5px",
+                  padding: "8px 10px",
+                  fontSize: "14px",
+                }}
+                onClick={handleCloseAlert}
+              >
+                X
+              </button>
+            </div>
+          </div>
+        ) : null}
       </AppBar>
       <div className={classes.toolBarMargin} />
       <Box
@@ -50,7 +120,7 @@ export default function Header(props) {
         <Grid
           container
           spacing={2}
-          columns={16}
+          columns={24}
           justifyContent="center"
           alignItems="center"
           direction="column"
@@ -65,20 +135,33 @@ export default function Header(props) {
           }}
         >
           <Grid item xs={8}>
-            <TextField
-              required
-              id="standard-search"
-              label="Departure Airport"
-              variant="standard"
+            <AirportFilter
+              fieldLabel="Departure Airport"
+              setAirport={setDepartureAirport}
             />
           </Grid>
           <Grid item xs={8}>
-            <TextField
-              required
-              id="standard-search"
-              label="Arrival Airport"
-              variant="standard"
+            <AirportFilter
+              fieldLabel="Arrival Airport"
+              setAirport={setArrivalAirport}
             />
+          </Grid>
+          <Grid item xs={4}>
+            <button
+              style={{
+                width: "100%",
+                color: "black",
+                backgroundColor: "transparent",
+                border: "1px solid grey",
+                cursor: "pointer",
+                borderRadius: "5px",
+                padding: "8px 105px",
+                marginBottom: "6px",
+              }}
+              onClick={(e) => handleSubmit(e)}
+            >
+              Submit
+            </button>
           </Grid>
         </Grid>
       </Box>
