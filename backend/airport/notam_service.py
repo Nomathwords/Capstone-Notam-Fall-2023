@@ -1,5 +1,5 @@
 import pip._vendor.requests as requests
-from . import credentials, csv_parser, lat_long_shifting
+from . import credentials, csv_parser, lat_long_shifting, notam_filter
 
 api_url = "https://external-api.faa.gov/notamapi/v1/notams?"
 headers =  {"Content-Type":"application/json", "client_id": credentials.client_id, 
@@ -12,8 +12,9 @@ def get_notams(departure_airport, destination_airport):
      
     # Get lat/longs of dep and dest airports 
     dep_lat, dep_long, dest_lat, dest_long = csv_parser.get_lat_long(departure_airport, destination_airport)
-        
-    # Get depature notams
+       
+    #Get depature notams
+
     notams = retrieve_location_notams(departure_airport)
     
     # Get lat/longs between dep and dest airports 
@@ -29,24 +30,13 @@ def get_notams(departure_airport, destination_airport):
     
     # Get GPS notams
     notams += retrieve_location_notams("GPS");
-
-    # Possibly consolidate this code into a function later
-    notams_length = len(notams)
-
-    # Add tags to the NOTAMs
-    for i in range(0, notams_length):
-        if notams[i]['properties']['coreNOTAMData']['notam']['classification'] == 'MIL':
-            notams[i]["CS4273_SRC"] = "MIL"
-
-        elif notams[i]['properties']['coreNOTAMData']['notam']['classification'] == 'FDC':
-            notams[i]["CS4273_SRC"] = "FDC"
-
-        elif notams[i]['properties']['coreNOTAMData']['notam']['location'] == 'GPS':
-            notams[i]["CS4273_SRC"] = "GPS"
-
-        else:
-            notams[i]["CS4273_SRC"] = "General"
-
+    
+    print(f"Filtering {len(notams)} notams")
+    
+    notams = notam_filter.filter_notams(notams)
+    
+    print(f"Sending {len(notams)} notams")
+    
     return notams
 
 def retrieve_location_notams(location):
