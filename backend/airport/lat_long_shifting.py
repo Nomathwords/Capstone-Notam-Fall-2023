@@ -28,10 +28,10 @@ def calculate_next_coordinate(src_lat, src_long, dest_lat, dest_long, step_size_
         new_lat, new_long = calculate_new_coordinates(current_lat, current_long, land_dist, bearing)
         # Add coordinates to dictionary
         coordinates[i + 1] = (new_lat, new_long)
-        print("Step Coordinates :", new_lat, new_long)
+        print(f'Step Coordinates: {new_lat} {new_long}')
         # Check if destination is reached
         if haversine_distance(new_lat, new_long, dest_lat, dest_long) <= land_dist:
-            print("Reached Destination")
+            print("Reached Destination\n")
             break
 
         # Update current coordinates
@@ -42,6 +42,7 @@ def calculate_next_coordinate(src_lat, src_long, dest_lat, dest_long, step_size_
 
 
 def calculate_bearing(src_lat, src_long, dest_lat, dest_long):
+    
     # Convert to radians
     src_lat = math.radians(src_lat)
     src_long = math.radians(src_long)
@@ -64,8 +65,10 @@ def calculate_bearing(src_lat, src_long, dest_lat, dest_long):
 
 
 def calculate_new_coordinates(lat, long, distance, bearing):
+
     # Earth radius in miles
-    earth_radius = 3960  
+    earth_radius = 3960
+
     # Convert to radians
     lat, long, bearing = map(math.radians, [lat, long, bearing])
     distance = distance / earth_radius
@@ -77,8 +80,10 @@ def calculate_new_coordinates(lat, long, distance, bearing):
     return math.degrees(new_lat), math.degrees(new_long)
 
 def haversine_distance(src_lat, src_long, dest_lat, dest_long):
+
     # Convert to radians
     src_lat, src_long, dest_lat, dest_long = map(math.radians, [src_lat, src_long, dest_lat, dest_long])
+
     # Calculate difference in latitudes and longitudes
     dlat = dest_lat - src_lat
     dlon = dest_long - src_long
