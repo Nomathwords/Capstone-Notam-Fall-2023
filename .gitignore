@@ -281,4 +281,4 @@ sketch
 # End of https://www.toptal.com/developers/gitignore/api/react,django,python
 
 #Credentials
-/backend/backend/airport/credentials.py
+/backend/airport/credentials.py
