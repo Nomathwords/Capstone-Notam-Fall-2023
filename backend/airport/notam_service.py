@@ -1,5 +1,5 @@
 import pip._vendor.requests as requests
-from . import credentials, csv_parser, lat_long_shifting
+from . import credentials, csv_parser, lat_long_shifting, notam_filter, ranker
 
 api_url = "https://external-api.faa.gov/notamapi/v1/notams?"
 headers =  {"Content-Type":"application/json", "client_id": credentials.client_id, 
@@ -11,6 +11,7 @@ PAGE_SIZE = 200
 def get_notams(departure_airport, destination_airport):
      
     # Get lat/longs of dep and dest airports 
+    # Get lat/longs of dep and dest airports 
     dep_lat, dep_long, dest_lat, dest_long = csv_parser.get_lat_long(departure_airport, destination_airport)
         
     # Get depature notams
@@ -19,9 +20,9 @@ def get_notams(departure_airport, destination_airport):
     # Get lat/longs between dep and dest airports 
     lat_longs_between = lat_long_shifting.calculate_next_coordinate(dep_lat, dep_long, dest_lat, dest_long, 25)
     
-    # Get all lat/long notams that are between dep and est airports
+    # Get all lat/long notams that are between dep and dest airports
     for i in range(len(lat_longs_between)):
-        if i > 0 and  i < (len(lat_longs_between)-1) :
+        if i != 0:
             notams += retrieve_lat_long_notams(lat_longs_between[i][0], lat_longs_between[i][1])
     
     # Get destination_airport notams 
@@ -38,6 +39,16 @@ def get_notams(departure_airport, destination_airport):
     
      #Get airspace notams
     notams += retrieve_feature_notams("AIRSPACE")
+        
+    # Filter NOTAMs
+    print(f"Filtering {len(notams)} NOTAMs")
+    notams = notam_filter.filter_notams(notams)
+    print(f"Sending {len(notams)} NOTAMs\n")
+
+    # Rank NOTAMs
+    print("Ranking NOTAMs")
+    notams = ranker.determine_rank(notams)
+    print("Done ranking NOTAMs\n")
 
     return notams
 
@@ -51,24 +62,25 @@ def retrieve_location_notams(location):
     # Retrieve total number of pages and first list of notams
     total_pages = response.json()['totalPages']
     page_num = 1
-    print(total_pages)
-    print("Getting notams from page ", page_num)
+    print(f'Getting notams from page {page_num}')
     notams = response.json()['items']
     
     # Is there only one page of notams?
-    if total_pages==1:
+    if total_pages == 1:
+        print("\n")
         return notams
     
     # More than one page
     page_num += 1 
 
     # Retrieve the rest of the notams 
-    while page_num < (total_pages+1):
-        print("Getting notams from page ", page_num)
+    while page_num < (total_pages + 1):
+        print(f'Getting notams from page {page_num}')
         params = {"domesticLocation": location, "pageSize": PAGE_SIZE, "pageNum": int(page_num)}
         notams += query_notam_api(params).json()['items']
         page_num += 1
 
+    print("\n")
     return notams
 
 def retrieve_lat_long_notams(latitude, longitude):
@@ -81,23 +93,25 @@ def retrieve_lat_long_notams(latitude, longitude):
     # Retrieve total number of pages and first list of notams
     total_pages = response.json()['totalPages']
     page_num = 1
-    print("Getting notams from page ", page_num)
+    print(f'Getting notams from page {page_num}')
     notams = response.json()['items']
     
     # Is there only one page of notams?
     if total_pages == 1:
+        print("\n")
         return notams
     
     # More than one page
     page_num += 1
 
     # Retrieve the rest of the notams 
-    while page_num < (total_pages+1):
+    while page_num < (total_pages + 1):
         print(f'Getting notams from page {page_num}')
         params = {"locationLatitude": latitude, "locationLongitude": longitude, "locationRadius": 40, "pageSize": PAGE_SIZE, "pageNum": int(page_num)}
         notams += query_notam_api(params).json()['items']
         page_num += 1
 
+    print("\n")
     return notams
 
 def retrieve_feature_notams(feature):
