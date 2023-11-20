@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import { Typography } from "@mui/material";
@@ -9,6 +9,8 @@ import Grid from "@mui/material/Grid";
 import AirportFilter from "./AirportFilter";
 import { useState } from "react";
 import Alert from "@mui/material/Alert";
+import CustomizedAccordian from "./CustomizedAccordian";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const useStyles = makeStyles((theme) => ({
   toolBarMargin: {
@@ -25,13 +27,46 @@ export default function Header(props) {
   const [departureAirport, setDepartureAirport] = useState(null);
   const [arrivalAirport, setArrivalAirport] = useState(null);
   const [error, setError] = useState(false);
+  const [submitClicked, setSubmitClicked] = useState(false);
 
-  const handleSubmit = (event) => {
+  const [submit, setSubmit] = useState(false);
+
+  // Load notams from json
+
+  const [notams, setNotams] = useState(null);
+
+  useEffect(() => {
+    console.log(notams);
+    if (notams !== null) {
+      setSubmit(true);
+      console.log(notams);
+    }
+  }, [notams]);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    setSubmitClicked(true);
 
     // Set up backend call here
-    if (departureAirport && arrivalAirport) {
-      console.log(departureAirport, arrivalAirport);
+    if (
+      departureAirport &&
+      arrivalAirport &&
+      departureAirport !== arrivalAirport
+    ) {
+      // http://127.0.0.1:8000/airport/?departure=OKC&destination=LAW
+      // fetch data from a url endpoint
+      try {
+        const res = await fetch(
+          `http://127.0.0.1:8000/airport/?departure=${departureAirport.identifier}&destination=${arrivalAirport.identifier}`
+        );
+        const data = await res.json();
+        // if history not [] set history to data
+        if (data.length !== 0) {
+          setNotams(data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
       setError(false);
     } else {
       setError(true);
@@ -117,53 +152,61 @@ export default function Header(props) {
           alignItems: "center",
         }}
       >
-        <Grid
-          container
-          spacing={2}
-          columns={24}
-          justifyContent="center"
-          alignItems="center"
-          direction="column"
-          sx={{
-            zIndex: "1300",
-            bgcolor: "white",
-            marginLeft: "35%",
-            marginRight: "35%",
-            height: "200px",
-            borderRadius: "20px",
-            opacity: "0.9",
-          }}
-        >
-          <Grid item xs={8}>
-            <AirportFilter
-              fieldLabel="Departure Airport"
-              setAirport={setDepartureAirport}
-            />
+        {submit ? (
+          <Box sx={{ maxHeight: "70vh", width: "70vw", overflowY: "auto" }}>
+            <CustomizedAccordian notams={notams} />
+          </Box>
+        ) : submitClicked ? (
+          <CircularProgress sx={{ color: "white" }} size={100} />
+        ) : (
+          <Grid
+            container
+            spacing={2}
+            columns={24}
+            justifyContent="center"
+            alignItems="center"
+            direction="column"
+            sx={{
+              zIndex: "1300",
+              bgcolor: "white",
+              marginLeft: "35%",
+              marginRight: "35%",
+              height: "200px",
+              borderRadius: "20px",
+              opacity: "0.9",
+            }}
+          >
+            <Grid item xs={8}>
+              <AirportFilter
+                fieldLabel="Departure Airport"
+                setAirport={setDepartureAirport}
+              />
+            </Grid>
+            <Grid item xs={8}>
+              <AirportFilter
+                fieldLabel="Arrival Airport"
+                setAirport={setArrivalAirport}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <button
+                style={{
+                  width: "100%",
+                  color: "black",
+                  backgroundColor: "transparent",
+                  border: "1px solid grey",
+                  cursor: "pointer",
+                  borderRadius: "5px",
+                  padding: "8px 105px",
+                  marginBottom: "6px",
+                }}
+                onClick={(e) => handleSubmit(e)}
+              >
+                Submit
+              </button>
+            </Grid>
           </Grid>
-          <Grid item xs={8}>
-            <AirportFilter
-              fieldLabel="Arrival Airport"
-              setAirport={setArrivalAirport}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <button
-              style={{
-                width: "100%",
-                color: "black",
-                backgroundColor: "transparent",
-                border: "1px solid grey",
-                cursor: "pointer",
-                borderRadius: "5px",
-                padding: "8px 105px",
-                marginBottom: "6px",
-              }}
-              onClick={(e) => handleSubmit(e)}
-            >
-              Submit
-            </button>
-          </Grid>
-        </Grid>
+        )}
       </Box>
     </React.Fragment>
   );
