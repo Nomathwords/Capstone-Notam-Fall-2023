@@ -39,6 +39,7 @@ export default function Header(props) {
     console.log(notams);
     if (notams !== null) {
       setSubmit(true);
+      setSubmitClicked(false);
       console.log(notams);
     }
   }, [notams]);

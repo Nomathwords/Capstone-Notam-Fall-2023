@@ -29,9 +29,7 @@ const makeAccordian = (title, content) => {
           {content.map((item, index) => (
             <div>
               <Typography key={index}>{item}</Typography>
-              <Typography key={index}>
-                <br />
-              </Typography>
+              <br />
             </div>
           ))}
         </ul>
