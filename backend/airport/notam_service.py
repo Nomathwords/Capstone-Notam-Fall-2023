@@ -39,23 +39,6 @@ def get_notams(departure_airport, destination_airport):
      #Get airspace notams
     notams += retrieve_feature_notams("AIRSPACE")
 
-    # Possibly consolidate this code into a function later
-    notams_length = len(notams)
-
-    # Add tags to the NOTAMs
-    for i in range(0, notams_length):
-        if notams[i]['properties']['coreNOTAMData']['notam']['classification'] == 'MIL':
-            notams[i]["CS4273_SRC"] = "MIL"
-
-        elif notams[i]['properties']['coreNOTAMData']['notam']['classification'] == 'FDC':
-            notams[i]["CS4273_SRC"] = "FDC"
-
-        elif notams[i]['properties']['coreNOTAMData']['notam']['location'] == 'GPS':
-            notams[i]["CS4273_SRC"] = "GPS"
-
-        else:
-            notams[i]["CS4273_SRC"] = "General"
-
     return notams
 
 def retrieve_location_notams(location):
