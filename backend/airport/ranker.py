@@ -1,26 +1,27 @@
 # Keywords
-high = ["OUT OF SERVICE", "HIJACKING", "BOMB THREAT", "INCURSION", "FIRE EMERGENCY", "FUEL", 
-        "WIND SHEAR", "AERODROME LIGHTING", "VIP MOVEMENT", "AERODROME CLOSED", "AERODROME CLSD", 
-        "AERODROME USE CAUTION", "PROHIBITED", "HAZARD", "OBSTACLE", "OBST", "TEMPORARY FLIGHT RESTRICTIONS", 
-        "TWR CLSD"]
+high = ["OUT OF SERVICE", " OTS", "OTS/BROKEN" "HIJACKING", "BOMB THREAT", "INCURSION", "FIRE EMERGENCY", "FUEL", 
+        "WIND SHEAR", "AERODROME LIGHTING", "VIP", "AERODROME CLOSED", "AERODROME CLSD", "AERODROME USE CAUTION", 
+        "PROHIBITED", "TEMPORARY FLIGHT RESTRICTIONS", "TWR CLSD"]
 
 medium = ["NAVIGATION AIDS", "EQUIPMENT MAINTENANCE", "COMMUNICATIONS ISSUES", "MILITARY EXERCISES", 
-         "VFR/IFR CONDITIONS", "AIR TRAFFIC CONTROL", "RESTRICTED", "LIGHTING", "CRANE", "SQUAWK",
-         "PROCEDURE NA"]
+         "VFR/IFR CONDITIONS", "AIR TRAFFIC CONTROL", "RESTRICTED", "LIGHTING", "SQUAWK", "PROCEDURE NA", 
+         "RADAR APPROACH CLOSED", "UNUSABLE"]
 
-low = ["RADAR APPROACH CLOSED", "RAMP CLSD", "WILDLIFE ACTIVITY", "CONSTRUCTION", "ROADWORK", 
-       "FUEL PRICE CHANGE", "LOCAL EVENTS", "GPS INTERFERENCE", "SVC TAR U/S", "UNUSABLE", "ROUTE",
-       "AIRSPACE UAS", "NOT STD", "EXCAVATION"]
+low = ["WILDLIFE HAZARD", "CONSTRUCTION", "ROADWORK", "FUEL PRICE CHANGE", "LOCAL EVENTS", 
+       "GPS INTERFERENCE", "SVC TAR U/S", "ROUTE", "AIRSPACE UAS", "NOT STD", "EXCAVATION", "WIP", 
+       "ALTIMETER UNREL", "U/S", "UNSERVICEABLE", "SIGN", "CRANE", "OBST", "OBSTACLE", "SPEED RESTRICTION", 
+       "FOD"]
 
 def determine_rank(notams):
     for notam in notams:
 
-        # Keyword used to restart the loop correctly. Needed when using a for loop to check for keywords
+        # Variable used to restart the loop correctly. Needed when using a for loop to check for keywords
         found_keyword = False
 
         # Check for high importance keywords not directly next to each other
-        if ((("RUNWAY" in notam["text"] or "RWY" in notam["text"])  and ("CLOSED" in notam["text"] or "CLSD" in notam["text"])) 
-            or (("AIRPORT" in notam["text"] or "AP" in notam["text"]) and ("CLOSED" in notam["text"] or "CLSD" in notam["text"]))):
+        if ((("RUNWAY" in notam["text"] or "RWY " in notam["text"]) and ("CLOSED" in notam["text"] or "CLSD" in notam["text"])) 
+            or (("AIRPORT" in notam["text"] or "AP " in notam["text"]) and ("CLOSED" in notam["text"] or "CLSD" in notam["text"]))
+            or ("HAZARD" in notam["text"] and "WILDLIFE HAZARD" not in notam["text"])):
 
             notam["CS4273_Rank"] = "High"
             continue
@@ -38,6 +39,7 @@ def determine_rank(notams):
 
         # Check for medium importance keywords not directly next to each other
         if (("DRONE" in notam["text"] and "FLIGHT OPERATIONS" in notam["text"])):
+
             notam["CS4273_Rank"] = "Medium"
             continue
 
@@ -53,10 +55,10 @@ def determine_rank(notams):
             continue
         
         # Check for low importance keywords not directly next to each other
-        if ((("TOWER LGT" in notam["text"] or "WIND TURBINE LGT" in notam["text"] or "NAV" in notam["text"] or "RWY" in notam["text"]) and ("U/S" in notam["text"]))
-            or ("COM VOICE" in notam["text"] and "CHANGED" in notam["text"]) 
+        if (("COM VOICE" in notam["text"] and "CHANGED" in notam["text"])
             or ("TWY" in notam["text"] and ("CLSD" in notam["text"] or "CLOSED" in notam["text"]))
-            or ("NOT" in notam["text"] and "AVBL" in notam["text"])):
+            or ("RAMP" in notam["text"] and ("CLSD" in notam["text"] or "CLOSED" in notam["text"]))
+            or ("NOT" in notam["text"] and ("AVBL" in notam["text"]) or "AVAILABLE" in notam["text"])):
 
             notam["CS4273_Rank"] = "Low"
             continue
