@@ -1,7 +1,7 @@
 import csv, sys
 
 #path to airport csv file
-airport_csv_path = '/Users/creightoncornelison/Dev/CapstoneNotam/NOTAM/backend/airport/Airports.csv'
+airport_csv_path = ''
 
 def get_lat_long(departure, destination):
     #variables to hold lat and long values for dep and dest
