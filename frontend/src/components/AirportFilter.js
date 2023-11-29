@@ -5,7 +5,7 @@ import { airports } from "./utils/Airports";
 const filterOptions = createFilterOptions({
   matchFrom: "any",
   limit: 5,
-  stringify: (option) => `${option.identifier} ${option.label}`,
+  stringify: (option) => `${option.identifier}`,
 });
 
 const AirportFilter = ({ fieldLabel, setAirport }) => {

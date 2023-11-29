@@ -44,6 +44,12 @@ export default function Header(props) {
     }
   }, [notams]);
 
+  const handleNewRequest = (event) => {
+    event.preventDefault();
+    setSubmit(false);
+    setNotams(null);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitClicked(true);
@@ -154,7 +160,32 @@ export default function Header(props) {
         }}
       >
         {submit ? (
-          <Box sx={{ maxHeight: "70vh", width: "70vw", overflowY: "auto" }}>
+          <Box
+            sx={{
+              maxHeight: "70vh",
+              width: "70vw",
+              overflowY: "auto",
+              display: "flex-column",
+            }}
+          >
+            <button
+              style={{
+                width: "100%",
+                height: "10%",
+                color: "white",
+                fontSize: "20px",
+                backgroundColor: "rgba(51, 112, 180, 0.8)",
+                border: "1px solid white",
+                cursor: "pointer",
+                borderRadius: "5px",
+                padding: "8px 105px",
+                marginBottom: "6px",
+                marginRight: "10px",
+              }}
+              onClick={(e) => handleNewRequest(e)}
+            >
+              New Request
+            </button>
             <CustomizedAccordian notams={notams} />
           </Box>
         ) : submitClicked ? (
