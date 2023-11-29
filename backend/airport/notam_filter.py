@@ -8,18 +8,22 @@ def filter_notams(notam_list):
 
     # Filter out notams with the same key text in the set
     for notam in notam_list:
-
+        
         # See if there is a duplicate 
         notam_text = notam["properties"]["coreNOTAMData"]["notam"]["text"]
-
+        notam_translations = notam["properties"]["coreNOTAMData"]["notamTranslation"]
+        
+        for translation in notam_translations:
+            if translation["type"] == "LOCAL_FORMAT":
+                notam_text = translation["simpleText"]
+        
         if notam_text not in filtered_notams.keys():
-
             # Append notam to the dictionary if it is not a duplicate
             filtered_notams[notam_text]= {
                                'time':notam["properties"]["coreNOTAMData"]["notam"]["issued"],
                                'location':notam["properties"]["coreNOTAMData"]["notam"]["location"],
                                'classification':notam["properties"]["coreNOTAMData"]["notam"]["classification"], 
-                               'text':notam["properties"]["coreNOTAMData"]["notam"]["text"]}
+                               'text':notam_text}
         else:
             continue
             
