@@ -32,13 +32,13 @@ def get_notams(departure_airport, destination_airport):
     notams += retrieve_location_notams("GPS");
     
     #Get chart notams
-    notams += retrieve_feature_notams("CHART")
+    #notams += retrieve_feature_notams("CHART")
     
     #Get special use airspace notams
-    notams += retrieve_feature_notams("SPECIAL")
+    #notams += retrieve_feature_notams("SPECIAL")
     
      #Get airspace notams
-    notams += retrieve_feature_notams("AIRSPACE")
+    #notams += retrieve_feature_notams("AIRSPACE")
         
     # Filter NOTAMs
     print(f"Filtering {len(notams)} NOTAMs")
@@ -124,10 +124,12 @@ def retrieve_feature_notams(feature):
     # Retrieve total number of pages and first list of notams
     total_pages = response.json()['totalPages']
     page_num = 1
+    print(f'Getting notams from page {page_num}')
     notams = response.json()['items']
     
     # Is there only one page of notams?
     if total_pages == 1:
+        print("\n")
         return notams
     
     # More than one page
@@ -140,6 +142,7 @@ def retrieve_feature_notams(feature):
         notams += query_notam_api(params).json()['items']
         page_num += 1
 
+    print("\n")
     return notams
     
 # Hit FAA api

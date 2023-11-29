@@ -1,9 +1,10 @@
 import math
-#import folium
 
 def calculate_next_coordinate(src_lat, src_long, dest_lat, dest_long, step_size_in_nm):
+    
     # 1 nautical mile = 1.150779448 miles
-    conversion_factor = 1.150779448 
+    conversion_factor = 1.150779448
+
     # Get distance in land miles
     land_dist = step_size_in_nm * conversion_factor
 
@@ -12,6 +13,7 @@ def calculate_next_coordinate(src_lat, src_long, dest_lat, dest_long, step_size_
 
     # Calculate total distance
     total_dist = haversine_distance(src_lat, src_long, dest_lat, dest_long)
+    
     # Calculate number of steps to reach destination
     steps = int(total_dist / land_dist)
 
@@ -32,12 +34,14 @@ def calculate_next_coordinate(src_lat, src_long, dest_lat, dest_long, step_size_
         # Check if destination is reached
         if haversine_distance(new_lat, new_long, dest_lat, dest_long) <= land_dist:
             print("Reached Destination\n")
+            print("\n")
             break
 
         # Update current coordinates
         current_lat = new_lat
         current_long = new_long
 
+    print("\n")
     return coordinates
 
 
@@ -92,7 +96,7 @@ def haversine_distance(src_lat, src_long, dest_lat, dest_long):
     a = math.sin(dlat / 2) ** 2 + math.cos(src_lat) * math.cos(dest_lat) * math.sin(dlon / 2) ** 2
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
-    return 3961 * c  # Earth radius in miles
+    return 3960 * c  # Earth radius in miles
 
 
 def main():
