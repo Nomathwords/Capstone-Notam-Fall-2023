@@ -1,15 +1,28 @@
-# Keywords
-high = ["OUT OF SERVICE", " OTS", "OTS/BROKEN" "HIJACKING", "BOMB THREAT", "INCURSION", "FIRE EMERGENCY", "FUEL", 
+
+''' Below are keywords that frequently appear in NOTAM text. The noncontiguous lists are keywords that we are 
+searching for that do not directly follow each other in the text. For example, in a NOTAM that contains the text
+'!GYI 01/003 GYI RWY 13/31 CLSD 2101061509-PERM', the important keywords are 'RWY' and 'CLSD'. I have put these
+keywords into a list of tuples that will be iterated over. If the keywords in the tuples appear in the text, 
+then a rank will be applied to that specific NOTAM. Note that once we find a keyword, we quit looking for any
+other keywords and move on to the next NOTAM. '''
+
+high = ["OUT OF SERVICE", " OTS", "OTS/BROKEN" "HIJACKING", "BOMB THREAT", "INCURSION", "FIRE EMERGENCY", "FUEL",
         "WIND SHEAR", "AERODROME LIGHTING", "VIP", "AERODROME CLOSED", "AERODROME CLSD", "AERODROME USE CAUTION", 
-        "PROHIBITED", "TEMPORARY FLIGHT RESTRICTIONS", "TWR CLSD", "AERODROME MILITARY ACFT"]
+        "PROHIBITED", "TEMPORARY FLIGHT RESTRICTIONS", "TWR CLSD", "AERODROME MILITARY ACFT", "AD AP CLSD"]
+
+# HAZARD is not a tuple, but we will check to make sure WILFLIFE HAZARD does not appear in the text
+high_noncontiguous = [(("RUNWAY", "CLOSED"), ("RUNWAY", "CLSD"), ("RWY", "CLOSED"), ("RWY", "CLSD"), 
+                       ("AIRPORT", "CLOSED"), ("AIRPORT", "CLSD"), ("HAZARD",),)]
 
 medium = ["NAVIGATION AIDS", "EQUIPMENT MAINTENANCE", "COMMUNICATIONS ISSUES", "MILITARY EXERCISES", 
          "VFR/IFR CONDITIONS", "AIR TRAFFIC CONTROL", "RESTRICTED", "LIGHTING", "SQUAWK", "PROCEDURE NA", 
          "RADAR APPROACH CLOSED", "UNUSABLE"]
 
+medium_noncontiguous = [(("DRONE", "FLIGHT OPERATIONS"), ("AIRSPACE", "MOA"),)]
+
 low = ["WILDLIFE HAZARD", "CONSTRUCTION", "ROADWORK", "FUEL PRICE CHANGE", "LOCAL EVENTS", 'FIREFIGHTER',
        "GPS INTERFERENCE", "SVC TAR U/S", "ROUTE", "AIRSPACE UAS", "NOT STD", "EXCAVATION", "WIP", 
-       "ALTIMETER UNREL", "U/S", "UNSERVICEABLE", "SIGN", "CRANE", "OBST", "OBSTACLE", "SPEED RESTRICTION", 
+       "ALTIMETER UNREL", "UNSERVICEABLE", "SIGN", "CRANE", "OBST", "OBSTACLE", "SPEED RESTRICTION", 
        "FOD", "UNREL", "AIRSPACE CANNON", "APP CLSD", "NOT MNT", "NOT AUTHORIZED", "TAKEOFF MINIMUMS",
        "MARKINGS", "OUT FOR MAINTENANCE", "CHART", "SPECIAL", "AIRSPACE", " ACT", "TEMPORARY RIG",
        "ALL OTHER DATA REMAINS AS PUBLISHED", "DME REQUIRED", "NA OR ONLY USABLE", " CAT", "AMDT",
@@ -24,7 +37,15 @@ low = ["WILDLIFE HAZARD", "CONSTRUCTION", "ROADWORK", "FUEL PRICE CHANGE", "LOCA
        "WORKING IN VICINITY", "WORKING IN THE VICINITY", "TRANSMISSION LINE TOWERS", "THR DISPLACED",
        "BASE CLSD", "INTRUSIVE OPERATIONS", "IN THE EVENT OF MISSED APPROACH", "NOT INSTALLED", "BASE CLSD", 
        "INTRUSIVE OPERATIONS", "IN THE EVENT OF MISSED APPROACH", "DEPARTURE", "APPROVED PPR", "RUN UPS",
-       "REQUIRED MIN CLIMB", "MIN ALT", "NOT COINCIDENT"]
+       "REQUIRED MIN CLIMB", "MIN ALT", "NOT COINCIDENT", "U/S"]
+
+low_noncontiguous = [(("COM VOICE", "CHANGED"), ("TWY", "CLSD"), ("TWY", "CLOSED"), ("RAMP", "CLSD"),
+                      ("RAMP", "CLOSED"), ("NOT", "AVBL"), ("NOT", "AVAILABLE"), ("LIGHTS", "O/S"),
+                      ("TXL", "CLSD"), ("TXL", "CLOSED"), ("TAXILANE", "CLSD"), ("TAXILANE", "CLOSED"),
+                      ("CHANGE", "TO"), ("CHG", "TO"), ("RUNUP PAD", "CLSD"), ("RUNUP PAD", "CLOSED"), 
+                      ("PCT", "WET"), ("PCT", "ICE"), ("APRON", "CLOSED"), ("APRON", "CLSD"), ("APN", "CLSD"),
+                      ("APN", "CLOSED"), ("SPOT", "CLSD"), ("SPOT", "CLOSED"), ("RWY", "NOW"), 
+                      ("CROSS", "AT OR ABOVE"), ("UNLIGHTED", "TOWER"))]
 
 def determine_rank(notams):
     for notam in notams:
@@ -33,16 +54,30 @@ def determine_rank(notams):
         found_keyword = False
 
         # Check for high importance keywords not directly next to each other
-        if ((("RUNWAY" in notam["text"] or "RWY " in notam["text"]) and ("CLOSED" in notam["text"] or "CLSD" in notam["text"])) 
-            or (("AIRPORT" in notam["text"] or "AP " in notam["text"]) and ("CLOSED" in notam["text"] or "CLSD" in notam["text"]))
-            or ("HAZARD" in notam["text"] and "WILDLIFE HAZARD" not in notam["text"])):
+        for tuple in high_noncontiguous: # Grab a tuple
+            for keywords in tuple: # Grab the keywords in the tuple
+                if all(singular_keyword in notam["text"] for singular_keyword in keywords): # Check for each keyword
 
-            notam["CS4273_Rank"] = "High"
+                    # Make sure WILDLIFE HAZARD is not ranked as High
+                    if "HAZARD" in keywords and "WILDLIFE HAZARD" in notam["text"]:
+                        continue
+
+                    notam["CS4273_Keywords"] = keywords
+                    notam["CS4273_Rank"] = "High"
+                    found_keyword = True
+                    break  # Break out of the inner loop
+
+            if found_keyword:
+                break  # Break out of the outer loop
+
+        # If a high importance noncontiguous keyword is found, move on to the next NOTAM
+        if (found_keyword == True):
             continue
     
         # Check for other high importance keywords
         for keyword in high:
             if keyword in notam["text"]:
+                notam["CS4273_Keywords"] = keyword
                 notam["CS4273_Rank"] = "High"
                 found_keyword = True
                 break
@@ -52,15 +87,25 @@ def determine_rank(notams):
             continue
 
         # Check for medium importance keywords not directly next to each other
-        if (("DRONE" in notam["text"] and "FLIGHT OPERATIONS" in notam["text"])
-            or("AIRSPACE" in notam["text"] and "MOA" in notam["text"])):
+        for tuple in medium_noncontiguous: # Grab a tuple
+            for keywords in tuple: # Grab the keywords in the tuple
+                if all(singular_keyword in notam["text"] for singular_keyword in keywords): # Check for each keyword
+                    notam["CS4273_Keywords"] = keywords
+                    notam["CS4273_Rank"] = "Medium"
+                    found_keyword = True
+                    break  # Break out of the inner loop
 
-            notam["CS4273_Rank"] = "Medium"
+            if found_keyword:
+                break  # Break out of the outer loop
+
+        # If a medium importance noncontiguous keyword is found, move on to the next NOTAM
+        if (found_keyword == True):
             continue
 
         # Check for other medium importance keywords
         for keyword in medium:
             if keyword in notam["text"]:
+                notam["CS4273_Keywords"] = keyword
                 notam["CS4273_Rank"] = "Medium"
                 found_keyword = True
                 break
@@ -68,29 +113,27 @@ def determine_rank(notams):
         # If a medium importance keyword is found, move on to the next NOTAM
         if (found_keyword == True):
             continue
-        
-        # Check for low importance keywords not directly next to each other
-        if (("COM VOICE" in notam["text"] and "CHANGED" in notam["text"])
-            or ("TWY" in notam["text"] and ("CLSD" in notam["text"] or "CLOSED" in notam["text"]))
-            or ("RAMP" in notam["text"] and ("CLSD" in notam["text"] or "CLOSED" in notam["text"]))
-            or ("NOT" in notam["text"] and ("AVBL" in notam["text"]) or "AVAILABLE" in notam["text"])
-            or ("LIGHTS" in notam["text"] and "O/S" in notam["text"])
-            or (("TXL" in notam["text"] or "TAXILANE" in notam["text"]) and ("CLSD" in notam["text"] or "CLOSED" in notam["text"]))
-            or (("CHANGE" in notam["text"] or "CHG" in notam["text"]) and "TO" in notam["text"])
-            or ("RUNUP PAD" in notam["text"] and ("CLSD" in notam["text"] or "CLOSED" in notam["text"]))
-            or ("PCT" in notam["text"] and ("WET" in notam["text"] or "ICE" in notam["text"]))
-            or (("APRON" in notam["text"] or "APN" in notam["text"]) and ("CLSD" in notam["text"] or "CLOSED" in notam["text"]))
-            or ("SPOT" in notam["text"] and ("CLSD" in notam["text"] or "CLOSED" in notam["text"]))
-            or ("RWY" in notam["text"] and "NOW" in notam["text"])
-            or ("CROSS" in notam["text"] and "AT OR ABOVE" in notam["text"])
-            or ("UNLIGHTED" in notam["text"] and "TOWER" in notam["text"])):
 
-            notam["CS4273_Rank"] = "Low"
+        # Check for low importance keywords not directly next to each other
+        for tuple in low_noncontiguous: # Grab a tuple
+            for keywords in tuple: # Grab the keywords in the tuple
+                if all(singular_keyword in notam["text"] for singular_keyword in keywords): # Check for each keyword
+                    notam["CS4273_Keywords"] = keywords
+                    notam["CS4273_Rank"] = "Low"
+                    found_keyword = True
+                    break  # Break out of the inner loop
+
+            if found_keyword:
+                break  # Break out of the outer loop
+
+        # If a low importance noncontiguous keyword is found, move on to the next NOTAM
+        if (found_keyword == True):
             continue
         
         # Check for other low importance keywords
         for keyword in low:
-            if keyword in notam["text"]:            
+            if keyword in notam["text"]: 
+                notam["CS4273_Keywords"] = keyword           
                 notam["CS4273_Rank"] = "Low"
                 found_keyword = True
                 break
