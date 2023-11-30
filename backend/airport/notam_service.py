@@ -29,16 +29,7 @@ def get_notams(departure_airport, destination_airport):
     notams += retrieve_location_notams(destination_airport)
     
     # Get GPS notams
-    notams += retrieve_location_notams("GPS");
-    
-    #Get chart notams
-    #notams += retrieve_feature_notams("CHART")
-    
-    #Get special use airspace notams
-    #notams += retrieve_feature_notams("SPECIAL")
-    
-     #Get airspace notams
-    #notams += retrieve_feature_notams("AIRSPACE")
+    notams += retrieve_location_notams("GPS")
         
     # Filter NOTAMs
     print(f"Filtering {len(notams)} NOTAMs")
@@ -108,37 +99,6 @@ def retrieve_lat_long_notams(latitude, longitude):
     while page_num < (total_pages + 1):
         print(f'Getting notams from page {page_num}')
         params = {"locationLatitude": latitude, "locationLongitude": longitude, "locationRadius": 40, "pageSize": PAGE_SIZE, "pageNum": int(page_num)}
-        notams += query_notam_api(params).json()['items']
-        page_num += 1
-
-    print("\n")
-    return notams
-
-def retrieve_feature_notams(feature):
-    print(f'Getting {feature} notams')
-
-    # Get the first response
-    params = {"featureType": feature, "pageSize": PAGE_SIZE}
-    response = query_notam_api(params)
-    
-    # Retrieve total number of pages and first list of notams
-    total_pages = response.json()['totalPages']
-    page_num = 1
-    print(f'Getting notams from page {page_num}')
-    notams = response.json()['items']
-    
-    # Is there only one page of notams?
-    if total_pages == 1:
-        print("\n")
-        return notams
-    
-    # More than one page
-    page_num += 1
-
-    # Retrieve the rest of the notams 
-    while page_num < (total_pages+1):
-        print(f'Getting notams from page {page_num}')
-        params = {"featureType": feature, "pageSize": PAGE_SIZE, "pageNum": int(page_num)}
         notams += query_notam_api(params).json()['items']
         page_num += 1
 
