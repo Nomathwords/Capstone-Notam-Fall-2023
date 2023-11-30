@@ -9,7 +9,7 @@ other keywords and move on to the next NOTAM. '''
 high = ["OUT OF SERVICE", " OTS", "OTS/BROKEN" "HIJACKING", "BOMB THREAT", "INCURSION", "FIRE EMERGENCY", "FUEL",
         "WIND SHEAR", "AERODROME LIGHTING", "VIP", "AERODROME CLOSED", "AERODROME CLSD", "AERODROME USE CAUTION", 
         "PROHIBITED", "TEMPORARY FLIGHT RESTRICTIONS", "TWR CLSD", "AERODROME MILITARY ACFT", "AD AP CLSD",
-        "HIGH SPEED ACFT"]
+        "HIGH SPEED ACFT", "ABN U/S"]
 
 # HAZARD is not a tuple, but we will check to make sure WILFLIFE HAZARD does not appear in the text
 high_noncontiguous = [(("RUNWAY", "CLOSED"), ("RUNWAY", "CLSD"), ("RWY", "CLOSED"), ("RWY", "CLSD"), 
