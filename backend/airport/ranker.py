@@ -1,11 +1,18 @@
-# Keywords
-high = ["OUT OF SERVICE", " OTS", "OTS/BROKEN" "HIJACKING", "BOMB THREAT", "INCURSION", "FIRE EMERGENCY", "FUEL", 
-        "WIND SHEAR", "AERODROME LIGHTING", "VIP", "AERODROME CLOSED", "AERODROME CLSD", "AERODROME USE CAUTION", 
-        "PROHIBITED", "TEMPORARY FLIGHT RESTRICTIONS", "TWR CLSD", "AERODROME MILITARY ACFT"]
 
+''' Below are keywords that frequently appear in NOTAM text. The noncontiguous lists are keywords that we are 
+searching for that do not directly follow each other in the text. For example, in a NOTAM that contains the text
+'!GYI 01/003 GYI RWY 13/31 CLSD 2101061509-PERM', the important keywords are 'RWY' and 'CLSD'. I have put these
+keywords into a list of tuples that will be iterated over. If the keywords in the tuples appear in the text, 
+then a rank will be applied to that specific NOTAM. Note that once we find a keyword, we quit looking for any
+other keywords and move on to the next NOTAM. '''
+
+high = ["OUT OF SERVICE", " OTS", "OTS/BROKEN" "HIJACKING", "BOMB THREAT", "INCURSION", "FIRE EMERGENCY", "FUEL",
+        "WIND SHEAR", "AERODROME LIGHTING", "VIP", "AERODROME CLOSED", "AERODROME CLSD", "AERODROME USE CAUTION", 
+        "PROHIBITED", "TEMPORARY FLIGHT RESTRICTIONS", "TWR CLSD", "AERODROME MILITARY ACFT", "AD AP CLSD"]
+
+# HAZARD is not a tuple, but we will check to make sure WILFLIFE HAZARD does not appear in the text
 high_noncontiguous = [(("RUNWAY", "CLOSED"), ("RUNWAY", "CLSD"), ("RWY", "CLOSED"), ("RWY", "CLSD"), 
-                       ("AIRPORT", "CLOSED"), ("AIRPORT", "CLSD"), (" AP ", "CLOSED"), (" AP ", "CLSD"),
-                       ("HAZARD",),)]
+                       ("AIRPORT", "CLOSED"), ("AIRPORT", "CLSD"), ("HAZARD",),)]
 
 medium = ["NAVIGATION AIDS", "EQUIPMENT MAINTENANCE", "COMMUNICATIONS ISSUES", "MILITARY EXERCISES", 
          "VFR/IFR CONDITIONS", "AIR TRAFFIC CONTROL", "RESTRICTED", "LIGHTING", "SQUAWK", "PROCEDURE NA", 
