@@ -54,89 +54,42 @@ def determine_rank(notams):
         found_keyword = False
 
         # Check for high importance keywords not directly next to each other
-        for tuple in high_noncontiguous: # Grab a tuple
-            for keywords in tuple: # Grab the keywords in the tuple
-                if all(singular_keyword in notam["text"] for singular_keyword in keywords): # Check for each keyword
-
-                    # Make sure WILDLIFE HAZARD is not ranked as High
-                    if "HAZARD" in keywords and "WILDLIFE HAZARD" in notam["text"]:
-                        continue
-
-                    notam["CS4273_Keywords"] = keywords
-                    notam["CS4273_Rank"] = "High"
-                    found_keyword = True
-                    break  # Break out of the inner loop
-
-            if found_keyword:
-                break  # Break out of the outer loop
+        notam, found_keyword = rank_noncontiguous_keywords(notam, "High", high_noncontiguous, found_keyword)
 
         # If a high importance noncontiguous keyword is found, move on to the next NOTAM
         if (found_keyword == True):
             continue
-    
+
         # Check for other high importance keywords
-        for keyword in high:
-            if keyword in notam["text"]:
-                notam["CS4273_Keywords"] = keyword
-                notam["CS4273_Rank"] = "High"
-                found_keyword = True
-                break
+        notam, found_keyword = rank_contiguous_keywords(notam, "High", high, found_keyword)
     
         # If a high importance keyword is found, move on to the next NOTAM
         if (found_keyword == True):
             continue
 
         # Check for medium importance keywords not directly next to each other
-        for tuple in medium_noncontiguous: # Grab a tuple
-            for keywords in tuple: # Grab the keywords in the tuple
-                if all(singular_keyword in notam["text"] for singular_keyword in keywords): # Check for each keyword
-                    notam["CS4273_Keywords"] = keywords
-                    notam["CS4273_Rank"] = "Medium"
-                    found_keyword = True
-                    break  # Break out of the inner loop
-
-            if found_keyword:
-                break  # Break out of the outer loop
+        notam, found_keyword = rank_noncontiguous_keywords(notam, "Medium", medium_noncontiguous, found_keyword)
 
         # If a medium importance noncontiguous keyword is found, move on to the next NOTAM
         if (found_keyword == True):
             continue
 
         # Check for other medium importance keywords
-        for keyword in medium:
-            if keyword in notam["text"]:
-                notam["CS4273_Keywords"] = keyword
-                notam["CS4273_Rank"] = "Medium"
-                found_keyword = True
-                break
+        notam, found_keyword = rank_contiguous_keywords(notam, "Medium", medium, found_keyword)
 
         # If a medium importance keyword is found, move on to the next NOTAM
         if (found_keyword == True):
             continue
 
         # Check for low importance keywords not directly next to each other
-        for tuple in low_noncontiguous: # Grab a tuple
-            for keywords in tuple: # Grab the keywords in the tuple
-                if all(singular_keyword in notam["text"] for singular_keyword in keywords): # Check for each keyword
-                    notam["CS4273_Keywords"] = keywords
-                    notam["CS4273_Rank"] = "Low"
-                    found_keyword = True
-                    break  # Break out of the inner loop
-
-            if found_keyword:
-                break  # Break out of the outer loop
+        notam, found_keyword = rank_noncontiguous_keywords(notam, "Low", low_noncontiguous, found_keyword)
 
         # If a low importance noncontiguous keyword is found, move on to the next NOTAM
         if (found_keyword == True):
             continue
         
         # Check for other low importance keywords
-        for keyword in low:
-            if keyword in notam["text"]: 
-                notam["CS4273_Keywords"] = keyword           
-                notam["CS4273_Rank"] = "Low"
-                found_keyword = True
-                break
+        notam, found_keyword = rank_contiguous_keywords(notam, "Low", low, found_keyword)
 
         # If a low keyword is found, move on to the next NOTAM
         if (found_keyword == True):
@@ -146,3 +99,34 @@ def determine_rank(notams):
         notam["CS4273_Rank"] = "Other"
 
     return notams
+
+# Iterate through a list of contiguous keywords, and if found in the text, give the NOTAM a rank
+def rank_contiguous_keywords(notam, rank, keyword_list, found_keyword):
+    for keyword in keyword_list:
+        if keyword in notam["text"]: 
+            notam["CS4273_Keywords"] = keyword         
+            notam["CS4273_Rank"] = rank
+            found_keyword = True
+            break
+    
+    return notam, found_keyword
+
+# Iterate through a list of noncontiguous keywords, and if found in the text, give the NOTAM a rank
+def rank_noncontiguous_keywords(notam, rank, keyword_list, found_keyword):
+    for tuple in keyword_list: # Grab a tuple
+        for keywords in tuple: # Grab the keywords in the tuple
+            if all(singular_keyword in notam["text"] for singular_keyword in keywords): # Check for each keyword
+
+                # Make sure WILDLIFE HAZARD is not ranked as High
+                if (("HAZARD" in keywords and "WILDLIFE HAZARD" in notam["text"]) and (rank == "High")):
+                    continue
+
+                notam["CS4273_Keywords"] = keywords
+                notam["CS4273_Rank"] = rank
+                found_keyword = True
+                break  # Break out of the inner loop
+
+        if found_keyword:
+            break  # Break out of the outer loop
+    
+    return notam, found_keyword
