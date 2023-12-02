@@ -28,9 +28,7 @@ const makeAccordian = (title, content) => {
         <ul>
           {content.map((item, index) => (
             <div>
-              <Typography key={index}>
-                {item[0]}: {item[1]}
-              </Typography>
+              <Typography key={index}>{item[0]}</Typography>
               <br />
             </div>
           ))}
@@ -48,16 +46,10 @@ export default function CustomizedAccordian({ notams }) {
 
   // Get text from each notam
   // Get the text and location from each notam
-  const highNotamText = highNotams.map((notam) => [notam.location, notam.text]);
-  const mediumNotamText = mediumNotams.map((notam) => [
-    notam.location,
-    notam.text,
-  ]);
-  const lowNotamText = lowNotams.map((notam) => [notam.location, notam.text]);
-  const otherNotamText = otherNotams.map((notam) => [
-    notam.location,
-    notam.text,
-  ]);
+  const highNotamText = highNotams.map((notam) => [notam.text]);
+  const mediumNotamText = mediumNotams.map((notam) => [notam.text]);
+  const lowNotamText = lowNotams.map((notam) => [notam.text]);
+  const otherNotamText = otherNotams.map((notam) => [notam.text]);
 
   return (
     <div>
