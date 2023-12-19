@@ -1,4 +1,5 @@
 import math
+from . import mapper
 
 def calculate_next_coordinate(src_lat, src_long, dest_lat, dest_long, step_size_in_nm):
     
@@ -22,7 +23,6 @@ def calculate_next_coordinate(src_lat, src_long, dest_lat, dest_long, step_size_
 
     # Create a dictionary to store coordinates
     coordinates = {}
-    coordinates[0] = (src_lat, src_long)
 
     # Calculate coordinates for each step
     for i in range(0,steps):
@@ -34,14 +34,16 @@ def calculate_next_coordinate(src_lat, src_long, dest_lat, dest_long, step_size_
         # Check if destination is reached
         if haversine_distance(new_lat, new_long, dest_lat, dest_long) <= land_dist:
             print("Reached Destination\n")
-            print("\n")
             break
 
         # Update current coordinates
         current_lat = new_lat
         current_long = new_long
+        bearing = calculate_bearing(current_lat, current_long, dest_lat, dest_long)
 
-    print("\n")
+    # Create map
+    mapper.create_map(src_lat, src_long, dest_lat, dest_long, coordinates)
+
     return coordinates
 
 

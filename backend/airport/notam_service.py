@@ -21,9 +21,8 @@ def get_notams(departure_airport, destination_airport):
     lat_longs_between = lat_long_shifting.calculate_next_coordinate(dep_lat, dep_long, dest_lat, dest_long, 25)
     
     # Get all lat/long notams that are between dep and dest airports
-    for i in range(len(lat_longs_between)):
-        if i != 0:
-            notams += retrieve_lat_long_notams(lat_longs_between[i][0], lat_longs_between[i][1])
+    for coords in lat_longs_between:
+        notams += retrieve_lat_long_notams(lat_longs_between[coords][0], lat_longs_between[coords][1])
     
     # Get destination_airport notams 
     notams += retrieve_location_notams(destination_airport)
