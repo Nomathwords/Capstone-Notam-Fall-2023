@@ -1,5 +1,4 @@
 import math
-from . import mapper
 
 def calculate_next_coordinate(src_lat, src_long, dest_lat, dest_long, step_size_in_nm):
     
@@ -40,9 +39,6 @@ def calculate_next_coordinate(src_lat, src_long, dest_lat, dest_long, step_size_
         current_lat = new_lat
         current_long = new_long
         bearing = calculate_bearing(current_lat, current_long, dest_lat, dest_long)
-
-    # Create map
-    mapper.create_map(src_lat, src_long, dest_lat, dest_long, coordinates)
 
     return coordinates
 
