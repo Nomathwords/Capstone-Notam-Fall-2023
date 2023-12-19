@@ -1,4 +1,5 @@
 import math
+from . import mapper
 
 def calculate_next_coordinate(src_lat, src_long, dest_lat, dest_long, step_size_in_nm):
     
@@ -22,7 +23,6 @@ def calculate_next_coordinate(src_lat, src_long, dest_lat, dest_long, step_size_
 
     # Create a dictionary to store coordinates
     coordinates = {}
-    coordinates[0] = (src_lat, src_long)
 
     # Calculate coordinates for each step
     for i in range(0,steps):
@@ -34,14 +34,16 @@ def calculate_next_coordinate(src_lat, src_long, dest_lat, dest_long, step_size_
         # Check if destination is reached
         if haversine_distance(new_lat, new_long, dest_lat, dest_long) <= land_dist:
             print("Reached Destination\n")
-            print("\n")
             break
 
         # Update current coordinates
         current_lat = new_lat
         current_long = new_long
+        bearing = calculate_bearing(current_lat, current_long, dest_lat, dest_long)
 
-    print("\n")
+    # Create map
+    mapper.create_map(src_lat, src_long, dest_lat, dest_long, coordinates)
+
     return coordinates
 
 
@@ -66,7 +68,6 @@ def calculate_bearing(src_lat, src_long, dest_lat, dest_long):
     bearing = (bearing + 360) % 360 # ??????
 
     return bearing
-
 
 def calculate_new_coordinates(lat, long, distance, bearing):
 
@@ -97,61 +98,3 @@ def haversine_distance(src_lat, src_long, dest_lat, dest_long):
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
     return 3960 * c  # Earth radius in miles
-
-
-def main():
-    # Denver 
-    # -104.673828
-    # 39.849312
-
-    # Minneapolis
-    # -93.2131
-    # 44.8849
-
-    # OKC
-    # -97.6054750543682,
-    # 35.4059492646923
-
-    # DFW
-    # -97.0829472893097,
-    # 32.9097103713996
-
-    denver_lat = 39.849312
-    denver_long = -104.673828
-    minneapolis_lat = 44.8849
-    minneapolis_long = -93.2131
-    okc_lat = 35.4059492646923
-    okc_long = -97.6054750543682
-    dfw_lat = 32.9097103713996
-    dfw_long = -97.0829472893097
-
-    cities = ["Denver", "Minneapolis", "OKC", "DFW"]
-
-    locations_lat = [denver_lat, minneapolis_lat, okc_lat, dfw_lat]
-    locations_long = [denver_long, minneapolis_long, okc_long, dfw_long]
-
-
-    for i in range(0, len(locations_lat)):
-        for j in range(0, len(locations_lat)):
-            if i != j:
-                print("From", locations_lat[i], locations_long[i], "to", locations_lat[j], locations_long[j])
-                coordinates = calculate_next_coordinate(locations_lat[i], locations_long[i], locations_lat[j], locations_long[j], 25)
-                print("Coordinates :", coordinates)
-                print("")
-
-                # Create a base map centered at the average latitude and longitude
-                avg_lat = sum(coord[0] for coord in coordinates.values()) / len(coordinates)
-                avg_long = sum(coord[1] for coord in coordinates.values()) / len(coordinates)
-
-                #m = folium.Map(location=[avg_lat, avg_long], zoom_start=6)
-
-                # Add markers for each coordinate
-                # for coord in coordinates.values():
-                    #folium.Marker(location=coord).add_to(m)
-
-                # Save the map as an HTML file with name of the two cities
-                #m.save("maps/" + cities[i] + "_to_" + cities[j] + ".html")
-                
-
-if __name__ == '__main__':
-    main()
