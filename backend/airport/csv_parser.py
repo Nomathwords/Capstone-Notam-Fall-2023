@@ -1,10 +1,15 @@
-import csv, sys
-import os
-
-#path to airport csv file
-airport_csv_path = os.path.join( 'airport', 'Airports.csv' )
+import csv, sys, os
+from . import airport_csv_downloader
 
 def get_lat_long(departure, destination):
+
+    # Path to the Airports.csv file
+    airport_csv_path = os.path.join( 'airport', 'Airports.csv' )
+
+    # Download the csv if needed
+    if(os.path.isfile(airport_csv_path) == False):
+        airport_csv_downloader.download_airports_csv()
+
     #variables to hold lat and long values for dep and dest
     dep_lat = -1.0
     dep_long = -1.0
