@@ -6,9 +6,9 @@ keywords into a list of tuples that will be iterated over. If the keywords in th
 then a rank will be applied to that specific NOTAM. Note that once we find a keyword, we quit looking for any
 other keywords and move on to the next NOTAM. '''
 
-high = ["OUT OF SERVICE", " OTS", "OTS/BROKEN" "HIJACKING", "BOMB THREAT", "INCURSION", "FIRE EMERGENCY", "FUEL",
+high = ["OUT OF SERVICE", " OTS", "OTS/BROKEN", "HIJACKING", "BOMB THREAT", "INCURSION", "FIRE EMERGENCY", "FUEL",
         "WIND SHEAR", "AERODROME LIGHTING", "VIP", "AERODROME CLOSED", "AERODROME CLSD", "AERODROME USE CAUTION", 
-        "PROHIBITED", "TEMPORARY FLIGHT RESTRICTIONS", "TWR CLSD", "AERODROME MILITARY ACFT", "AD AP CLSD",
+        "PROHIBITED", " TEMPORARY FLIGHT RESTRICTIONS", "TWR CLSD", "AERODROME MILITARY ACFT", "AD AP CLSD",
         "HIGH SPEED ACFT", "ABN U/S"]
 
 # HAZARD is not a tuple, but we will check to make sure WILFLIFE HAZARD does not appear in the text
@@ -91,7 +91,7 @@ def determine_rank(notams):
         # Check for other low importance keywords
         notam, found_keyword = rank_contiguous_keywords(notam, "Low", low, found_keyword)
 
-        # If a low keyword is found, move on to the next NOTAM
+        # If a low importance keyword is found, move on to the next NOTAM
         if (found_keyword == True):
             continue
         
@@ -102,8 +102,12 @@ def determine_rank(notams):
 
 # Iterate through a list of contiguous keywords, and if found in the text, give the NOTAM a rank
 def rank_contiguous_keywords(notam, rank, keyword_list, found_keyword):
+
+    # Remove newlines before checking the text
+    cleaned_text = notam["text"].replace('\n', ' ')
+
     for keyword in keyword_list:
-        if keyword in notam["text"]: 
+        if keyword in cleaned_text: 
             notam["CS4273_Keywords"] = keyword         
             notam["CS4273_Rank"] = rank
             found_keyword = True
@@ -113,12 +117,16 @@ def rank_contiguous_keywords(notam, rank, keyword_list, found_keyword):
 
 # Iterate through a list of noncontiguous keywords, and if found in the text, give the NOTAM a rank
 def rank_noncontiguous_keywords(notam, rank, keyword_list, found_keyword):
+
+    # Remove newlines before checking the text
+    cleaned_text = notam["text"].replace('\n', ' ')
+
     for tuple in keyword_list: # Grab a tuple
         for keywords in tuple: # Grab the keywords in the tuple
-            if all(singular_keyword in notam["text"] for singular_keyword in keywords): # Check for each keyword
+            if all(singular_keyword in cleaned_text for singular_keyword in keywords): # Check for each keyword
 
-                # Make sure WILDLIFE HAZARD is not ranked as High
-                if (("HAZARD" in keywords and "WILDLIFE HAZARD" in notam["text"]) and (rank == "High")):
+                # Make sure WILDLIFE HAZARD is not ranked as High when checking for High keywords
+                if (("HAZARD" in keywords and "WILDLIFE HAZARD" in cleaned_text) and (rank == "High")):
                     continue
 
                 notam["CS4273_Keywords"] = keywords
