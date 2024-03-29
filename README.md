@@ -2,6 +2,8 @@
 
 This is a capstone project for OU Fall 2023 CS.
 
+📝 Note: This repository is a snapshot of my Fall 2023 capstone project, last updated on 03/29/2024. While the main development period was from August to December 2023, occasional fixes and updates were made until January 2024. Merged branches have been removed for clarity.
+
 # VERSIONS
 
 Install the following, if not installed already:
@@ -23,12 +25,11 @@ client_id=""
 client_secret=""
 ```
 
-3. Go to this link: https://adds-faa.opendata.arcgis.com/datasets/faa::airports-1/explore. Download the csv file of all the airports and move it to the "airport" directory.
-4. Go to the "csv_parser.py" file and paste the file path to the "Airports.csv" file in the "airport_csv_path" at the top. Make sure to replace all "\" with "/".
-5. Install the necessary django cors headers: `pip install django-cors-headers`
+3. Install the necessary django cors headers: `pip install django-cors-headers`.
+4. Install gmplot, a library that utilizes Google Maps, using `pip install gmplot`. We use this to plot the path from the departure airport to the destination airport.
+5. Register the Google Maps API Key as an environment variable on your computer, named "google_maps_api_key" (Hunter has this).
 
-If you are running the backend only:
-6.Open PostMan and paste in the folling endpoint: `http://127.0.0.1:8000/airport/?departure=OKC&destination=DFW`. This endpoing is using OKC as the departure and DFW as the destination. Feel free to change both of these.
+6. Open PostMan and paste in the following endpoint: `http://127.0.0.1:8000/airport/?departure=OKC&destination=DFW`. This endpoint is using OKC as the departure and DFW as the destination. Feel free to change both of these.
 
 7. Start the backend with the following command: `python3 manage.py runserver`.
 8. Hit the send button and the program will begin execution.
@@ -45,9 +46,9 @@ client_id=""
 client_secret=""
 ```
 
-3. Go to this link: https://adds-faa.opendata.arcgis.com/datasets/faa::airports-1/explore. Download the csv file of all the airports and move it to the "airport" directory.
-4. Go to the "csv_parser.py" file and paste the file path to the "Airports.csv" file in the "airport_csv_path" at the top. Make sure to replace all "\" with "/".
-5. Install the necessary django cors headers: `pip install django-cors-headers`
+3. Install the necessary django cors headers: `pip install django-cors-headers`
+4. Install gmplot, a library that utilizes Google Maps, using `pip install gmplot`. We use this to plot the path from the departure airport to the destination airport.
+5. Register the Google Maps API Key as an environment variable on your computer, named "google_maps_api_key" (Hunter has this).
 6. Start the backend with the following command: `python3 manage.py runserver`.
 
 Before starting the frontend, do the following steps:
